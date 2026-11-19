@@ -11,3 +11,4 @@ logs/
 .dagster_home/
 tmp*/
 site/data/
+.taste-skill/

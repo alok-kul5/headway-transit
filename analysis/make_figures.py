@@ -93,7 +93,8 @@ def main() -> None:
     plt.close(fig)
 
     # 4. Weather: buses only, to keep the mode mix constant.
-    w = q(con, """select precip_band, temp_band, count(*) n, count(distinct strftime(snapshot_local, '%Y-%m-%d %H')) as hours_observed,
+    w = q(con, """select precip_band, temp_band, count(*) n,
+                  count(distinct strftime(snapshot_local, '%Y-%m-%d %H')) as hours_observed,
                   avg(is_on_time::int)*100 on_time, median(delay_min) med
                   from marts.fct_delay_observations where mode = 'Bus' group by grouping sets ((precip_band), (temp_band))""")
     numbers["weather_bus"] = w.to_dict("records")

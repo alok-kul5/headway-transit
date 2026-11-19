@@ -37,8 +37,26 @@ QUERIES = {
     """,
     "hourly": "select * from marts.agg_hourly_mode order by mode, local_hour",
     "routes": """
-        select * from marts.agg_route_performance
-        where observations >= 30 order by median_delay_min desc
+        select a.*, r.route_color from marts.agg_route_performance a
+        left join staging.stg_routes r using (route_id)
+        where a.observations >= 30 order by a.median_delay_min desc
+    """,
+    # The newest snapshot, for the "right now" board: per mode, then the latest vehicles.
+    "now_modes": """
+        with latest as (select max(snapshot_ts) as ts from marts.fct_delay_observations)
+        select f.mode, count(*) as vehicles,
+               round(100.0 * avg(f.is_on_time::int), 1) as on_time_pct,
+               round(median(f.delay_min), 2) as median_delay_min
+        from marts.fct_delay_observations f join latest on f.snapshot_ts = latest.ts
+        group by f.mode order by vehicles desc
+    """,
+    "now_late": """
+        with latest as (select max(snapshot_ts) as ts from marts.fct_delay_observations)
+        select f.snapshot_ts, f.route_id, f.route_name, f.mode, f.stop_name, f.direction_id,
+               round(f.delay_min, 1) as delay_min, r.route_color
+        from marts.fct_delay_observations f join latest on f.snapshot_ts = latest.ts
+        left join staging.stg_routes r using (route_id)
+        order by f.delay_min desc limit 12
     """,
     "weather": "select * from marts.agg_weather_impact order by dimension, bucket, mode",
     "timeline": "select * exclude (snapshot_local) from marts.agg_snapshot_timeline order by snapshot_ts",

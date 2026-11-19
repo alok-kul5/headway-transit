@@ -1,86 +1,130 @@
 <!doctype html>
-<html lang="en">
+<html lang="en-US">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Boston Transit Delays</title>
-  <meta name="description" content="How late are MBTA buses and trains? Live delay measurements from GTFS-realtime joined with weather, rebuilt every 30 minutes by a Dagster + dbt + DuckDB pipeline.">
+  <title>How late is the T?</title>
+  <meta name="description" content="Live delays for every Boston bus and train: a snapshot of the MBTA's real-time feed every 30 minutes, checked against the timetable and the weather.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" defer></script>
   <script src="app.js" defer></script>
 </head>
 <body>
-  <header class="hero">
-    <div class="wrap">
-      <p class="eyebrow">MBTA · Boston · live data</p>
-      <h1>How late is the T?</h1>
-      <p class="lede">Every 30 minutes a pipeline takes a snapshot of every bus and train in Boston's
-        real-time feed, compares each vehicle's predicted arrival with its timetable, and joins the
-        weather for that hour. This page is rebuilt from the results each time.</p>
-      <p class="updated" id="updated">Loading…</p>
-    </div>
+  <header class="nav">
+    <a class="wordmark" href="#top"><span class="t-roundel" aria-hidden="true">T</span>How late is the T?</a>
+    <nav aria-label="Sections">
+      <a href="#now">Right now</a>
+      <a href="#modes">By mode</a>
+      <a href="#day">Through the day</a>
+      <a href="#routes">Routes</a>
+    </nav>
+    <a class="nav-action" href="https://github.com/alok-kul5/transit-data-pipeline">Source</a>
   </header>
 
-  <main class="wrap">
-    <section class="kpis" id="kpis" aria-label="Headline numbers"></section>
+  <main id="top">
+    <section class="hero" aria-labelledby="h1">
+      <div class="hero-card reveal">
+        <h1 id="h1">How late is the T?</h1>
+        <p class="big"><span id="big-pct">0</span><span class="pct">%</span></p>
+        <p class="big-label">of Boston's buses and trains are on time right now</p>
+        <p class="hero-sub" id="hero-sub">Loading the latest snapshot…</p>
+      </div>
 
-    <section class="card">
-      <h2>On-time performance over time</h2>
-      <p class="note">Share of vehicles running between 1 minute early and 5 minutes late, per snapshot.</p>
-      <div class="chart tall"><canvas id="timeline" aria-label="On-time share per snapshot"></canvas></div>
+      <section class="board reveal" id="now" aria-labelledby="board-h">
+        <header class="board-head">
+          <h2 id="board-h">Running latest right now</h2>
+          <p class="board-time" id="board-time"></p>
+        </header>
+        <ol class="board-rows" id="board"></ol>
+        <p class="board-foot">Minutes behind timetable at each vehicle's next stop</p>
+      </section>
     </section>
 
-    <div class="two">
-      <section class="card">
-        <h2>Delay by hour of day</h2>
-        <p class="note">Median delay in minutes, Boston time.</p>
-        <div class="legend" id="hourly-legend"></div>
-        <div class="chart"><canvas id="hourly" aria-label="Median delay by hour and mode"></canvas></div>
-      </section>
-      <section class="card">
-        <h2>By mode</h2>
-        <p class="note">Share of vehicles on time.</p>
-        <div class="chart"><canvas id="modes" aria-label="On-time share by mode"></canvas></div>
-      </section>
-    </div>
+    <section class="modes" id="modes" aria-labelledby="modes-h">
+      <h2 id="modes-h" class="section-title reveal">On time by mode, right now</h2>
+      <div class="mode-row" id="mode-row"></div>
+    </section>
 
-    <div class="two">
-      <section class="card">
-        <h2>Weather</h2>
-        <p class="note">Share on time, by precipitation that hour. Buses only, so a change in which modes are running isn't mistaken for a weather effect.</p>
-        <div class="chart"><canvas id="weather" aria-label="On-time share by precipitation"></canvas></div>
-        <p class="caveat" id="weather-caveat"></p>
-      </section>
-      <section class="card">
-        <h2>How late, exactly?</h2>
-        <p class="note">Distribution of delays (minutes; the ends include everything beyond).</p>
-        <div class="chart"><canvas id="histogram" aria-label="Distribution of delays"></canvas></div>
-      </section>
-    </div>
+    <section class="fleet" aria-labelledby="fleet-h">
+      <h2 id="fleet-h" class="section-title reveal">Four ways to be late</h2>
+      <div class="fleet-row">
+        <figure class="shot reveal" data-mode="Subway">
+          <div class="shot-img"><img src="assets/mbta-red-line-train-departing-quincy-adams.jpg" alt="A Red Line train pulling out of Quincy Adams station" loading="lazy" width="1920" height="1440"></div>
+          <figcaption><span class="shot-stat" data-stat="Subway">–</span><span class="shot-line"><i style="background:var(--red)"></i>Subway · Red Line, Quincy Adams</span></figcaption>
+        </figure>
+        <figure class="shot reveal" data-mode="Bus">
+          <div class="shot-img"><img src="assets/silver-line-at-d-street.jpg" alt="A Silver Line SL1 bus to Logan Airport at D Street, downtown Boston behind" loading="lazy" width="1542" height="1091"></div>
+          <figcaption><span class="shot-stat" data-stat="Bus">–</span><span class="shot-line"><i style="background:var(--bus)"></i>Bus · Silver Line, D Street</span></figcaption>
+        </figure>
+        <figure class="shot reveal" data-mode="Commuter rail">
+          <div class="shot-img"><img src="assets/mbta-commuter-rail-train-at-anderson-rtc.jpg" alt="A purple MBTA commuter rail locomotive arriving at Anderson RTC" loading="lazy" width="1920" height="1440"></div>
+          <figcaption><span class="shot-stat" data-stat="Commuter rail">–</span><span class="shot-line"><i style="background:var(--cr)"></i>Commuter rail · Anderson RTC, Woburn</span></figcaption>
+        </figure>
+        <figure class="shot reveal" data-mode="Light rail">
+          <div class="shot-img"><img src="assets/green-line-trolley-at-heath-st-boston.jpg" alt="A Green Line trolley turning at Heath Street" loading="lazy" width="1600" height="1200"></div>
+          <figcaption><span class="shot-stat" data-stat="Light rail">–</span><span class="shot-line"><i style="background:var(--green)"></i>Light rail · Green Line, Heath Street</span></figcaption>
+        </figure>
+      </div>
+    </section>
 
-    <section class="card">
-      <h2>Routes running latest</h2>
-      <p class="note">Routes with at least 30 observations, ranked by median delay.</p>
-      <div class="table-wrap">
-        <table class="routes">
-          <thead><tr><th>Route</th><th>Mode</th><th class="num">Median delay</th><th class="num">90th pct</th><th class="num">On time</th><th class="num">Obs.</th></tr></thead>
-          <tbody id="routes"></tbody>
+    <section class="split" id="day" aria-labelledby="day-h">
+      <h2 id="day-h" class="section-title reveal">Through the day</h2>
+      <div class="split-grid">
+        <figure class="panel reveal">
+          <figcaption><strong>On time, snapshot by snapshot</strong><span>Share of vehicles between 1 min early and 5 min late</span></figcaption>
+          <div class="chart tall"><canvas id="timeline" aria-label="On-time share per snapshot"></canvas></div>
+        </figure>
+        <figure class="panel reveal">
+          <figcaption><strong>Median delay by hour</strong><span id="hourly-legend" class="legend"></span></figcaption>
+          <div class="chart tall"><canvas id="hourly" aria-label="Median delay by hour of day and mode"></canvas></div>
+        </figure>
+      </div>
+    </section>
+
+    <section class="split" aria-labelledby="dist-h">
+      <h2 id="dist-h" class="section-title reveal">How late, and does the weather matter?</h2>
+      <div class="split-grid">
+        <figure class="panel reveal">
+          <figcaption><strong>How late, exactly</strong><span>Share of vehicles by minutes behind; the ends include everything beyond</span></figcaption>
+          <div class="chart"><canvas id="histogram" aria-label="Distribution of delays"></canvas></div>
+        </figure>
+        <figure class="panel reveal">
+          <figcaption><strong>Buses in the rain</strong><span>On time, by precipitation that hour (buses only, so the mode mix stays fixed)</span></figcaption>
+          <div class="chart"><canvas id="weather" aria-label="Bus on-time share by precipitation"></canvas></div>
+          <p class="caveat" id="weather-caveat"></p>
+        </figure>
+      </div>
+    </section>
+
+    <section class="routes" id="routes" aria-labelledby="routes-h">
+      <h2 id="routes-h" class="section-title reveal">Routes running latest</h2>
+      <p class="section-sub reveal">Routes with at least 30 observations, by median delay.</p>
+      <div class="table-wrap reveal">
+        <table>
+          <thead><tr><th scope="col">Route</th><th scope="col">Mode</th><th scope="col" class="num">Median delay</th><th scope="col" class="num">90th pct</th><th scope="col" class="num">On time</th><th scope="col" class="num">Seen</th></tr></thead>
+          <tbody id="routes-body"></tbody>
         </table>
       </div>
     </section>
 
-    <section class="card method">
-      <h2>How this is measured</h2>
-      <ul>
-        <li><strong>Source:</strong> MBTA's GTFS-realtime <code>TripUpdates</code> feed and static GTFS schedule; hourly weather from Open-Meteo.</li>
-        <li><strong>Delay</strong> = predicted arrival at the vehicle's next stop − scheduled arrival. Only predictions for a stop reached within 10 minutes count, so this is close to the actual delay rather than a forecast.</li>
-        <li>Only trips that run to a published timetable are included (subway trips added on the fly have no schedule to be late against).</li>
-        <li>Snapshots are a sample: each vehicle is seen once per snapshot, not at every stop.</li>
-      </ul>
-      <p><a href="https://github.com/alok-kul5/transit-data-pipeline">Source code and write-up on GitHub →</a></p>
+    <section class="method" aria-labelledby="method-h">
+      <h2 id="method-h" class="section-title reveal">How this is measured</h2>
+      <div class="method-grid reveal">
+        <p><strong>Every 30 minutes</strong> a pipeline (Dagster, dbt, DuckDB) snapshots the MBTA's GTFS-realtime feed and records each vehicle's predicted arrival at its next stop.</p>
+        <p><strong>Delay</strong> is that prediction minus the timetable, counted only when the stop is less than 10 minutes away, so it is close to the real delay rather than a forecast.</p>
+        <p><strong>On time</strong> means 1 minute early to 5 minutes late. Subway trips added on the fly have no timetable, so they are left out.</p>
+        <p><strong>Weather</strong> is Open-Meteo's hourly reading for downtown Boston, joined on the hour. Bad batches are quarantined before they reach this page.</p>
+      </div>
     </section>
   </main>
 
-  <footer class="wrap foot">Built with Dagster, dbt and DuckDB · data © MBTA, Open-Meteo (CC BY 4.0)</footer>
+  <footer class="footer">
+    <p class="footer-mark">How late is the T?</p>
+    <p class="footer-note" id="footer-note">Data © MBTA (MassDOT Developers License) and Open-Meteo (CC BY 4.0). <a href="https://github.com/alok-kul5/transit-data-pipeline">Source and write-up on GitHub</a>.</p>
+    <p class="credits">Pictures: <a href="https://commons.wikimedia.org/w/index.php?curid=10552964">“MBTA Red Line train departing Quincy Adams station”</a> by Ben Schumin, <a href="https://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0</a>; <a href="https://commons.wikimedia.org/w/index.php?curid=23331688">“Green Line Trolley at Heath St Boston 2012”</a> by Wikiklrsc, <a href="https://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0</a>; <a href="https://commons.wikimedia.org/w/index.php?curid=137696221">“MBTA commuter rail train at Anderson RTC, 2023”</a> by Ilia2011, <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>; <a href="https://commons.wikimedia.org/w/index.php?curid=15374968">“Silver Line at D Street”</a> by Connie, <a href="https://creativecommons.org/licenses/by/2.0/">CC BY 2.0</a>; all via Wikimedia Commons.</p>
+  </footer>
 </body>
 </html>
