@@ -88,3 +88,22 @@ jobs:
           path: site
       - id: deploy
         uses: actions/deploy-pages@v4
+
+  # GitHub's cron can be delayed by hours, or not start at all on new repos.
+  # So each run queues the next one 30 minutes later (workflow_dispatch is the
+  # one event a workflow may trigger with its own token). The concurrency
+  # group above keeps at most one run going. Set the repository variable
+  # PIPELINE_CHAIN to "off" to stop the chain; the cron schedule remains.
+  next:
+    needs: run
+    if: always() && vars.PIPELINE_CHAIN != 'off'
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+    steps:
+      - name: Wait 30 minutes
+        run: sleep 1500
+      - name: Queue the next run
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh workflow run pipeline.yml --repo "$GITHUB_REPOSITORY" --ref main
