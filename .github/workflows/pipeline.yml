@@ -1,0 +1,90 @@
+name: Collect and publish
+
+# Every 30 minutes: take a real-time snapshot, fetch weather, rebuild the dbt
+# models, run every data quality check, and redeploy the dashboard.
+# Raw snapshots live on the `data` branch, which is rewritten as a single
+# commit each run so the repository doesn't grow with history.
+
+on:
+  schedule:
+    - cron: "7,37 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pipeline
+  cancel-in-progress: false
+
+env:
+  RETENTION_DAYS: 60
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Restore raw data from the data branch
+        env:
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git clone --depth 1 --branch data "https://x-access-token:${TOKEN}@github.com/${GITHUB_REPOSITORY}.git" store \
+            || (mkdir store && git -C store init -q -b data)
+          mkdir -p data/raw
+          for d in trip_updates weather; do [ -d "store/$d" ] && cp -r "store/$d" data/raw/; done
+          [ -d store/quarantine ] && cp -r store/quarantine data/ || true
+          echo "snapshots restored: $(find data/raw/trip_updates -name '*.parquet' 2>/dev/null | wc -l)"
+
+      - name: Cache static GTFS
+        uses: actions/cache@v4
+        with:
+          path: data/raw/gtfs
+          key: gtfs-${{ github.run_id }}
+          restore-keys: gtfs-
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - run: pip install -r requirements.txt
+
+      - name: Run pipeline
+        id: pipeline
+        env:
+          DAGSTER_HOME: ${{ runner.temp }}/dagster
+        run: |
+          mkdir -p "$DAGSTER_HOME"
+          (cd dbt && dbt parse -q)
+          dagster job execute -m transit_pipeline.definitions -j collect_and_build
+
+      - name: Save raw data back to the data branch
+        if: always()
+        run: |
+          python scripts/prune_snapshots.py data/raw/trip_updates --days "$RETENTION_DAYS"
+          rm -rf store/trip_updates store/weather store/quarantine
+          for d in trip_updates weather; do [ -d "data/raw/$d" ] && cp -r "data/raw/$d" store/; done
+          [ -d data/quarantine ] && cp -r data/quarantine store/ || true
+          cat > store/README.md <<'MD'
+          Raw data collected by the `Collect and publish` workflow. This branch is
+          rewritten on every run (one commit); see the main branch for the code.
+          MD
+          cd store
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -q --orphan snapshot
+          git add -A
+          git commit -q -m "Raw data as of $(date -u +%Y-%m-%dT%H:%MZ)"
+          git push -q -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git" snapshot:data
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+      - id: deploy
+        uses: actions/deploy-pages@v4

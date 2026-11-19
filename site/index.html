@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Boston Transit Delays</title>
+  <meta name="description" content="How late are MBTA buses and trains? Live delay measurements from GTFS-realtime joined with weather, rebuilt every 30 minutes by a Dagster + dbt + DuckDB pipeline.">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <header class="hero">
+    <div class="wrap">
+      <p class="eyebrow">MBTA · Boston · live data</p>
+      <h1>How late is the T?</h1>
+      <p class="lede">Every 30 minutes a pipeline takes a snapshot of every bus and train in Boston's
+        real-time feed, compares each vehicle's predicted arrival with its timetable, and joins the
+        weather for that hour. This page is rebuilt from the results each time.</p>
+      <p class="updated" id="updated">Loading…</p>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="kpis" id="kpis" aria-label="Headline numbers"></section>
+
+    <section class="card">
+      <h2>On-time performance over time</h2>
+      <p class="note">Share of vehicles running between 1 minute early and 5 minutes late, per snapshot.</p>
+      <div class="chart tall"><canvas id="timeline" aria-label="On-time share per snapshot"></canvas></div>
+    </section>
+
+    <div class="two">
+      <section class="card">
+        <h2>Delay by hour of day</h2>
+        <p class="note">Median delay in minutes, Boston time.</p>
+        <div class="legend" id="hourly-legend"></div>
+        <div class="chart"><canvas id="hourly" aria-label="Median delay by hour and mode"></canvas></div>
+      </section>
+      <section class="card">
+        <h2>By mode</h2>
+        <p class="note">Share of vehicles on time.</p>
+        <div class="chart"><canvas id="modes" aria-label="On-time share by mode"></canvas></div>
+      </section>
+    </div>
+
+    <div class="two">
+      <section class="card">
+        <h2>Weather</h2>
+        <p class="note">Share on time, by precipitation that hour. Buses only, so a change in which modes are running isn't mistaken for a weather effect.</p>
+        <div class="chart"><canvas id="weather" aria-label="On-time share by precipitation"></canvas></div>
+        <p class="caveat" id="weather-caveat"></p>
+      </section>
+      <section class="card">
+        <h2>How late, exactly?</h2>
+        <p class="note">Distribution of delays (minutes; the ends include everything beyond).</p>
+        <div class="chart"><canvas id="histogram" aria-label="Distribution of delays"></canvas></div>
+      </section>
+    </div>
+
+    <section class="card">
+      <h2>Routes running latest</h2>
+      <p class="note">Routes with at least 30 observations, ranked by median delay.</p>
+      <div class="table-wrap">
+        <table class="routes">
+          <thead><tr><th>Route</th><th>Mode</th><th class="num">Median delay</th><th class="num">90th pct</th><th class="num">On time</th><th class="num">Obs.</th></tr></thead>
+          <tbody id="routes"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="card method">
+      <h2>How this is measured</h2>
+      <ul>
+        <li><strong>Source:</strong> MBTA's GTFS-realtime <code>TripUpdates</code> feed and static GTFS schedule; hourly weather from Open-Meteo.</li>
+        <li><strong>Delay</strong> = predicted arrival at the vehicle's next stop − scheduled arrival. Only predictions for a stop reached within 10 minutes count, so this is close to the actual delay rather than a forecast.</li>
+        <li>Only trips that run to a published timetable are included (subway trips added on the fly have no schedule to be late against).</li>
+        <li>Snapshots are a sample: each vehicle is seen once per snapshot, not at every stop.</li>
+      </ul>
+      <p><a href="https://github.com/alok-kul5/transit-data-pipeline">Source code and write-up on GitHub →</a></p>
+    </section>
+  </main>
+
+  <footer class="wrap foot">Built with Dagster, dbt and DuckDB · data © MBTA, Open-Meteo (CC BY 4.0)</footer>
+</body>
+</html>

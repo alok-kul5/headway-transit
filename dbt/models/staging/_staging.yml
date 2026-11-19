@@ -1,0 +1,55 @@
+version: 2
+
+models:
+  - name: stg_trip_updates
+    description: Real-time snapshots, one row per trip per snapshot.
+    data_tests:
+      - unique_combination:
+          arguments: {columns: [snapshot_ts, trip_id]}
+    columns:
+      - name: snapshot_ts
+        data_tests: [not_null]
+      - name: trip_id
+        data_tests: [not_null]
+      - name: route_id
+        data_tests: [not_null]
+      - name: predicted_ts
+        data_tests: [not_null]
+      - name: horizon_s
+        description: Seconds from the snapshot until the predicted arrival.
+        data_tests:
+          - between:
+              arguments: {min_value: -21600, max_value: 21600}
+      - name: trip_schedule_relationship
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [SCHEDULED, ADDED, UNSCHEDULED, CANCELED, REPLACEMENT, DUPLICATED, DELETED, NEW]
+
+  - name: stg_weather
+    columns:
+      - name: hour_ts
+        data_tests: [unique, not_null]
+      - name: temperature_c
+        data_tests:
+          - between:
+              arguments: {min_value: -40, max_value: 45}
+      - name: precipitation_mm
+        data_tests:
+          - between:
+              arguments: {min_value: 0, max_value: 200}
+
+  - name: stg_routes
+    columns:
+      - name: route_id
+        data_tests: [unique, not_null]
+      - name: route_type
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [0, 1, 2, 3, 4, 5, 6, 7, 11, 12]
+
+  - name: stg_stops
+    columns:
+      - name: stop_id
+        data_tests: [unique, not_null]

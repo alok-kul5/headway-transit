@@ -1,0 +1,9 @@
+version: 2
+models:
+  - name: int_delay_observations
+    columns:
+      - name: delay_s
+        data_tests:
+          - not_null
+          - between:
+              arguments: {min_value: -14400, max_value: 14400}

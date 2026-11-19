@@ -1,0 +1,49 @@
+version: 2
+
+models:
+  - name: fct_delay_observations
+    description: One row per vehicle per snapshot with its current delay, route, stop and weather.
+    data_tests:
+      - unique_combination:
+          arguments: {columns: [snapshot_ts, trip_id]}
+    columns:
+      - name: route_id
+        data_tests:
+          - not_null
+          - relationships:
+              arguments: {to: ref('stg_routes'), field: route_id}
+      - name: mode
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [Light rail, Subway, Commuter rail, Bus, Ferry, Other]
+      - name: local_hour
+        data_tests:
+          - between:
+              arguments: {min_value: 0, max_value: 23}
+      - name: delay_s
+        data_tests: [not_null]
+
+  - name: agg_hourly_mode
+    data_tests:
+      - unique_combination:
+          arguments: {columns: [local_hour, mode]}
+
+  - name: agg_route_performance
+    columns:
+      - name: route_id
+        data_tests: [unique, not_null]
+      - name: observations
+        data_tests:
+          - between:
+              arguments: {min_value: 20, max_value: 100000000}
+
+  - name: agg_weather_impact
+    data_tests:
+      - unique_combination:
+          arguments: {columns: [dimension, bucket, mode]}
+
+  - name: agg_snapshot_timeline
+    columns:
+      - name: snapshot_ts
+        data_tests: [unique, not_null]

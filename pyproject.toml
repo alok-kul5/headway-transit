@@ -1,0 +1,25 @@
+[project]
+name = "transit-pipeline"
+version = "1.0.0"
+description = "MBTA real-time delays + weather: Dagster, dbt and DuckDB"
+requires-python = ">=3.11"
+
+[tool.dagster]
+module_name = "transit_pipeline.definitions"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+markers = ["slow: runs the whole Dagster job (dbt included)"]
+filterwarnings = ["ignore::DeprecationWarning", "ignore::dagster.BetaWarning", "ignore::dagster.PreviewWarning"]
+
+[tool.ruff]
+line-length = 130
+target-version = "py311"
+extend-exclude = ["dbt"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["transit_pipeline"]
