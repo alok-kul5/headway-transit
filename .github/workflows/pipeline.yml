@@ -24,7 +24,7 @@ jobs:
     # Only the collect-and-publish job holds the lock, so a run waiting in the
     # `next` job never blocks a fresh run from collecting and deploying.
     concurrency:
-      group: pipeline
+      group: pipeline-collect
       cancel-in-progress: false
     environment:
       name: github-pages
