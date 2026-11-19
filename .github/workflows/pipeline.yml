@@ -15,16 +15,17 @@ permissions:
   pages: write
   id-token: write
 
-concurrency:
-  group: pipeline
-  cancel-in-progress: false
-
 env:
   RETENTION_DAYS: 60
 
 jobs:
   run:
     runs-on: ubuntu-latest
+    # Only the collect-and-publish job holds the lock, so a run waiting in the
+    # `next` job never blocks a fresh run from collecting and deploying.
+    concurrency:
+      group: pipeline
+      cancel-in-progress: false
     environment:
       name: github-pages
       url: ${{ steps.deploy.outputs.page_url }}
