@@ -1,9 +1,13 @@
-# How late is the T? — a transit data pipeline
+<p align="center"><img src="docs/brand/mark.svg" width="88" height="88" alt="Headway logo"></p>
 
-[![CI](https://github.com/alok-kul5/transit-data-pipeline/actions/workflows/ci.yml/badge.svg)](https://github.com/alok-kul5/transit-data-pipeline/actions/workflows/ci.yml)
-[![Collect and publish](https://github.com/alok-kul5/transit-data-pipeline/actions/workflows/pipeline.yml/badge.svg)](https://github.com/alok-kul5/transit-data-pipeline/actions/workflows/pipeline.yml)
+<h1 align="center">Headway</h1>
 
-**Live dashboard: <https://alok-kul5.github.io/transit-data-pipeline/>**
+<p align="center"><b>How late is the T, really?</b><br>A Dagster, dbt and DuckDB pipeline that checks every Boston bus and train against the timetable every 30 minutes, with a live dashboard.</p>
+
+[![CI](https://github.com/alok-kul5/headway-transit/actions/workflows/ci.yml/badge.svg)](https://github.com/alok-kul5/headway-transit/actions/workflows/ci.yml)
+[![Collect and publish](https://github.com/alok-kul5/headway-transit/actions/workflows/pipeline.yml/badge.svg)](https://github.com/alok-kul5/headway-transit/actions/workflows/pipeline.yml)
+
+**Live dashboard: <https://alok-kul5.github.io/headway-transit/>**
 
 Every 30 minutes this pipeline snapshots every bus and train in Boston's **MBTA**
 real-time feed, works out how late each vehicle is against its published timetable,
@@ -155,3 +159,7 @@ tests/            pytest
 
 Transit data © MBTA, under the [MassDOT Developers License Agreement](https://www.mass.gov/files/documents/2017/10/27/develop_license_agree_0.pdf).
 Weather data from [Open-Meteo](https://open-meteo.com/) (CC BY 4.0). Code is MIT licensed.
+
+---
+
+<sub>One of six projects by [Alok Kulkarni](https://alok.is-a.dev): [Hearth](https://github.com/alok-kul5/hearth-iot) home sensors · **Headway** transit data · [Vigil](https://github.com/alok-kul5/vigil-soc) security triage · [Loupe](https://github.com/alok-kul5/loupe-vision) defect inspection · [Kharcha](https://github.com/alok-kul5/kharcha-finance) personal finance · [Stockroom](https://github.com/alok-kul5/stockroom-inventory) inventory.</sub>
