@@ -8,7 +8,7 @@
   <meta name="description" content="Live delays for every Boston bus and train: a snapshot of the MBTA's real-time feed every 30 minutes, checked against the timetable and the weather.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Geist+Mono:wght@400..600&family=Instrument+Serif:ital@1&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" defer></script>
   <script src="app.js" defer></script>
@@ -22,13 +22,15 @@
       <a href="#day">Through the day</a>
       <a href="#routes">Routes</a>
     </nav>
+    <span class="live" id="live" hidden><i></i><span id="live-text">Live</span></span>
     <a class="nav-action" href="https://github.com/alok-kul5/headway-transit">Source</a>
   </header>
 
   <main id="top">
     <section class="hero" aria-labelledby="h1">
       <div class="hero-card reveal">
-        <h1 id="h1">How late is the T?</h1>
+        <p class="eyebrow on-yellow"><i></i>MBTA · every vehicle, every 30 min</p>
+        <h1 id="h1">How late is <em>the T?</em></h1>
         <p class="big"><span id="big-pct">0</span><span class="pct">%</span></p>
         <p class="big-label">of Boston's buses and trains are on time right now</p>
         <p class="hero-sub" id="hero-sub">Loading the latest snapshot…</p>
@@ -45,12 +47,14 @@
     </section>
 
     <section class="modes" id="modes" aria-labelledby="modes-h">
-      <h2 id="modes-h" class="section-title reveal">On time by mode, right now</h2>
+      <p class="eyebrow reveal"><span>01</span>By mode</p>
+      <h2 id="modes-h" class="section-title reveal">On time by mode, <em>right now</em></h2>
       <div class="mode-row" id="mode-row"></div>
     </section>
 
     <section class="fleet" aria-labelledby="fleet-h">
-      <h2 id="fleet-h" class="section-title reveal">Four ways to be late</h2>
+      <p class="eyebrow reveal"><span>02</span>The fleet</p>
+      <h2 id="fleet-h" class="section-title reveal">Four ways to be <em>late</em></h2>
       <div class="fleet-row">
         <figure class="shot reveal" data-mode="Subway">
           <div class="shot-img"><img src="assets/mbta-red-line-train-departing-quincy-adams.jpg" alt="A Red Line train pulling out of Quincy Adams station" loading="lazy" width="1920" height="1440"></div>
@@ -72,7 +76,8 @@
     </section>
 
     <section class="split" id="day" aria-labelledby="day-h">
-      <h2 id="day-h" class="section-title reveal">Through the day</h2>
+      <p class="eyebrow reveal"><span>03</span>Through the day</p>
+      <h2 id="day-h" class="section-title reveal">Through <em>the day</em></h2>
       <div class="split-grid">
         <figure class="panel reveal">
           <figcaption><strong>On time, snapshot by snapshot</strong><span>Share of vehicles between 1 min early and 5 min late</span></figcaption>
@@ -86,7 +91,8 @@
     </section>
 
     <section class="split" aria-labelledby="dist-h">
-      <h2 id="dist-h" class="section-title reveal">How late, and does the weather matter?</h2>
+      <p class="eyebrow reveal"><span>04</span>Distribution and weather</p>
+      <h2 id="dist-h" class="section-title reveal">How late, and does the <em>weather</em> matter?</h2>
       <div class="split-grid">
         <figure class="panel reveal">
           <figcaption><strong>How late, exactly</strong><span>Share of vehicles by minutes behind; the ends include everything beyond</span></figcaption>
@@ -101,7 +107,8 @@
     </section>
 
     <section class="routes" id="routes" aria-labelledby="routes-h">
-      <h2 id="routes-h" class="section-title reveal">Routes running latest</h2>
+      <p class="eyebrow reveal"><span>05</span>Routes</p>
+      <h2 id="routes-h" class="section-title reveal">Routes running <em>latest</em></h2>
       <p class="section-sub reveal">Routes with at least 30 observations, by median delay.</p>
       <div class="table-wrap reveal">
         <table>
@@ -112,7 +119,8 @@
     </section>
 
     <section class="method" aria-labelledby="method-h">
-      <h2 id="method-h" class="section-title reveal">How this is measured</h2>
+      <p class="eyebrow reveal"><span>06</span>Method</p>
+      <h2 id="method-h" class="section-title reveal">How this is <em>measured</em></h2>
       <div class="method-grid reveal">
         <p><strong>Every 30 minutes</strong> a pipeline (Dagster, dbt, DuckDB) snapshots the MBTA's GTFS-realtime feed and records each vehicle's predicted arrival at its next stop.</p>
         <p><strong>Delay</strong> is that prediction minus the timetable, counted only when the stop is less than 10 minutes away, so it is close to the real delay rather than a forecast.</p>

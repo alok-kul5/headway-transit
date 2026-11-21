@@ -55,6 +55,13 @@ function hero(summary, nowModes, nowLate) {
     : "Waiting for the next snapshot.";
   const last = nowLate[0]?.snapshot_ts ?? summary.last_snapshot_ts;
   $("#board-time").textContent = last ? boston(last, { weekday: "short", hour: "numeric", minute: "2-digit" }) + " in Boston" : "";
+  if (last) {
+    const mins = Math.max(0, Math.round((Date.now() / 1000 - last) / 60));
+    const ago = mins < 60 ? `${mins} min ago` : mins < 1440 ? `${Math.round(mins / 60)} h ago` : `${Math.round(mins / 1440)} d ago`;
+    $("#live").hidden = false;
+    $("#live").classList.toggle("stale", mins > 90);
+    $("#live-text").textContent = `${mins > 90 ? "Last snapshot" : "Live"} · ${ago}`;
+  }
   $("#footer-note").insertAdjacentHTML("afterbegin",
     `${summary.snapshots} snapshots, ${Number(summary.observations).toLocaleString()} observations of ${summary.routes} routes since ${boston(summary.first_snapshot_ts, { month: "short", day: "numeric" })}. `);
 }
@@ -106,8 +113,8 @@ function base(extra = {}) {
       tooltip: { backgroundColor: css("--ink"), titleColor: css("--paper"), bodyColor: css("--paper"), padding: 10, cornerRadius: 10, displayColors: false },
     },
     scales: {
-      x: { grid: { display: false }, ticks: { color: ink, font: { family: "Archivo", size: 12 } }, border: { display: false } },
-      y: { grid: { color: grid, lineWidth: 2 }, ticks: { color: ink, font: { family: "Archivo", size: 12 } }, border: { display: false } },
+      x: { grid: { display: false }, ticks: { color: ink, font: { family: "Geist Mono", size: 11 } }, border: { display: false } },
+      y: { grid: { color: grid, lineWidth: 2 }, ticks: { color: ink, font: { family: "Geist Mono", size: 11 } }, border: { display: false } },
     },
     ...extra,
   };
