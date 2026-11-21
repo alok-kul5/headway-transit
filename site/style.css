@@ -283,3 +283,38 @@ th { font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.1em; font-w
 .eyebrow.on-dark { color: #ffffffb3; margin-bottom: 6px; }
 .eyebrow.on-dark i { width: 7px; height: 7px; border-radius: 50%; background: var(--red); }
 @media (max-width: 560px) { .reel { aspect-ratio: 4 / 3; border-radius: 22px; } }
+
+/* ── Details: preloader, nav pill, cursor, footer letters ── */
+.curtain {
+  position: fixed; inset: 0; z-index: 100; background: var(--board); color: var(--board-ink);
+  display: flex; align-items: flex-end; justify-content: space-between; padding: var(--gutter);
+  transition: transform 0.9s var(--ease); will-change: transform;
+}
+.curtain.up { transform: translateY(-100%); }
+.curtain-mark { font-size: clamp(56px, 11vw, 180px); font-weight: 900; font-stretch: 68%; letter-spacing: -0.045em; line-height: 0.85; color: #fff; }
+.curtain-count { font: 500 clamp(28px, 4vw, 56px)/1 var(--mono); font-variant-numeric: tabular-nums; }
+
+.nav nav { position: relative; align-items: center; }
+.nav-pill {
+  position: absolute; left: 0; top: 50%; height: 32px; margin-top: -16px; border-radius: 99px; z-index: -1;
+  background: var(--paper-2); border: 1px solid var(--line); opacity: 0; pointer-events: none;
+  transition: transform 0.5s var(--ease), width 0.5s var(--ease), opacity 0.3s var(--ease);
+}
+.nav nav a { transition: color 0.2s var(--ease); }
+.nav nav a.on { color: var(--ink); }
+.nav nav a.on::after { transform: scaleX(0) !important; }
+.nav-action { transition: transform 0.35s var(--ease), background 0.2s var(--ease); }
+
+.cursor {
+  position: fixed; left: 0; top: 0; z-index: 90; width: 28px; height: 28px; margin: -14px 0 0 -14px; border-radius: 50%;
+  border: 1.5px solid var(--ink); pointer-events: none; opacity: 0; mix-blend-mode: difference; border-color: #fff;
+  transition: opacity 0.3s var(--ease), width 0.35s var(--ease), height 0.35s var(--ease), margin 0.35s var(--ease), background 0.35s var(--ease);
+}
+.cursor.live { opacity: 1; }
+.cursor.big { width: 64px; height: 64px; margin: -32px 0 0 -32px; background: #fff; }
+
+.footer-mark span { display: inline-block; transform: translateY(105%); opacity: 0; transition: transform 0.9s var(--ease), opacity 0.6s var(--ease); transition-delay: calc(var(--i) * 45ms); }
+.footer-mark { overflow: hidden; }
+.footer-mark.in span { transform: none; opacity: 1; }
+.no-js .footer-mark span { transform: none; opacity: 1; }
+@media (prefers-reduced-motion: reduce) { .footer-mark span { transform: none !important; opacity: 1 !important; } }

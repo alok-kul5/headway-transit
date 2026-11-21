@@ -242,3 +242,75 @@ function reel() {
     $("#hero-sub").textContent = `Could not load data (${err.message}).`;
   }
 })();
+
+/* ── Details: preloader, scrollspy pill, cursor, magnetic button, footer letters ── */
+(() => {
+  const still = reduced();
+  const fine = matchMedia("(hover: hover) and (pointer: fine)").matches;
+
+  // Preloader: a departure-board curtain that lifts once the data is in.
+  if (!still) {
+    const c = document.createElement("div");
+    c.className = "curtain";
+    c.innerHTML = `<span class="curtain-mark">Headway</span><span class="curtain-count">00</span>`;
+    document.body.append(c);
+    const count = c.querySelector(".curtain-count"), t0 = performance.now();
+    let n = 0;
+    const tick = () => { n = Math.min(99, n + 7); count.textContent = String(n).padStart(2, "0"); if (!c.classList.contains("up")) setTimeout(tick, 40); };
+    tick();
+    const lift = () => setTimeout(() => { count.textContent = "100"; c.classList.add("up"); setTimeout(() => c.remove(), 1000); }, Math.max(0, 650 - (performance.now() - t0)));
+    addEventListener("load", lift, { once: true });
+    setTimeout(lift, 2500);
+  }
+
+  // Nav: a pill slides to the section in view.
+  const nav = document.querySelector(".nav nav");
+  if (nav) {
+    const pill = document.createElement("span");
+    pill.className = "nav-pill";
+    nav.prepend(pill);
+    const links = [...nav.querySelectorAll("a")];
+    const move = (a) => {
+      links.forEach((l) => l.classList.toggle("on", l === a));
+      if (!a) { pill.style.opacity = 0; return; }
+      pill.style.opacity = 1;
+      pill.style.width = `${a.offsetWidth + 20}px`;
+      pill.style.transform = `translateX(${a.offsetLeft - 10}px)`;
+    };
+    const spy = new IntersectionObserver((es) => {
+      for (const e of es) if (e.isIntersecting) move(links.find((l) => l.hash === `#${e.target.id}`));
+    }, { rootMargin: "-45% 0px -50% 0px" });
+    links.forEach((l) => { const s = document.querySelector(l.hash); if (s) spy.observe(s); });
+  }
+
+  if (!fine || still) return;
+
+  // Cursor: a small ring that trails the pointer and swells over things you can use.
+  const ring = document.createElement("div");
+  ring.className = "cursor";
+  document.body.append(ring);
+  let x = innerWidth / 2, y = innerHeight / 2, rx = x, ry = y;
+  addEventListener("pointermove", (e) => { x = e.clientX; y = e.clientY; ring.classList.add("live"); }, { passive: true });
+  document.addEventListener("pointerover", (e) => ring.classList.toggle("big", !!e.target.closest("a, button, .mode, .shot, .reel, tbody tr")));
+  document.addEventListener("pointerleave", () => ring.classList.remove("live"));
+  (function loop() { rx += (x - rx) * 0.2; ry += (y - ry) * 0.2; ring.style.transform = `translate(${rx}px, ${ry}px)`; requestAnimationFrame(loop); })();
+
+  // Magnetic "Source" button.
+  const mag = document.querySelector(".nav-action");
+  if (mag) {
+    mag.addEventListener("pointermove", (e) => {
+      const r = mag.getBoundingClientRect();
+      mag.style.transform = `translate(${(e.clientX - r.left - r.width / 2) * 0.25}px, ${(e.clientY - r.top - r.height / 2) * 0.35}px)`;
+    });
+    mag.addEventListener("pointerleave", () => { mag.style.transform = ""; });
+  }
+})();
+
+// Footer wordmark: letters rise one by one.
+(() => {
+  const m = document.querySelector(".footer-mark");
+  if (!m) return;
+  m.innerHTML = [...m.textContent].map((ch, i) => `<span style="--i:${i}">${ch}</span>`).join("");
+  m.setAttribute("aria-label", "Headway");
+  new IntersectionObserver(([e], o) => { if (e.isIntersecting) { m.classList.add("in"); o.disconnect(); } }, { threshold: 0.4 }).observe(m);
+})();
