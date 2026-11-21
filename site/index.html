@@ -8,7 +8,7 @@
   <meta name="description" content="Live delays for every Boston bus and train: a snapshot of the MBTA's real-time feed every 30 minutes, checked against the timetable and the weather.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Geist+Mono:wght@400..600&family=Instrument+Serif:ital@1&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Martian+Mono:wdth,wght@75..112.5,400..600&family=Bodoni+Moda:ital,opsz,wght@1,6..96,400..600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" defer></script>
   <script src="app.js" defer></script>
@@ -55,6 +55,12 @@
     <section class="fleet" aria-labelledby="fleet-h">
       <p class="eyebrow reveal"><span>02</span>The fleet</p>
       <h2 id="fleet-h" class="section-title reveal">Four ways to be <em>late</em></h2>
+      <figure class="reel reveal">
+        <video class="reel-video" muted loop playsinline preload="none" poster="assets/reel-poster.jpg" aria-label="Slow pans across a Red Line train, a Silver Line bus, a commuter rail locomotive and a Green Line trolley">
+          <source src="assets/reel.mp4" type="video/mp4">
+        </video>
+        <figcaption class="reel-cap"><span class="eyebrow on-dark"><i></i>Fleet reel</span><strong>Every mode, every half hour</strong></figcaption>
+      </figure>
       <div class="fleet-row">
         <figure class="shot reveal" data-mode="Subway">
           <div class="shot-img"><img src="assets/mbta-red-line-train-departing-quincy-adams.jpg" alt="A Red Line train pulling out of Quincy Adams station" loading="lazy" width="1920" height="1440"></div>
@@ -133,7 +139,7 @@
   <footer class="footer">
     <p class="footer-mark">Headway</p>
     <p class="footer-note" id="footer-note">Data © MBTA (MassDOT Developers License) and Open-Meteo (CC BY 4.0). <a href="https://github.com/alok-kul5/headway-transit">Source and write-up on GitHub</a>.</p>
-    <p class="credits">Pictures: <a href="https://commons.wikimedia.org/w/index.php?curid=10552964">“MBTA Red Line train departing Quincy Adams station”</a> by Ben Schumin, <a href="https://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0</a>; <a href="https://commons.wikimedia.org/w/index.php?curid=23331688">“Green Line Trolley at Heath St Boston 2012”</a> by Wikiklrsc, <a href="https://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0</a>; <a href="https://commons.wikimedia.org/w/index.php?curid=137696221">“MBTA commuter rail train at Anderson RTC, 2023”</a> by Ilia2011, <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>; <a href="https://commons.wikimedia.org/w/index.php?curid=15374968">“Silver Line at D Street”</a> by Connie, <a href="https://creativecommons.org/licenses/by/2.0/">CC BY 2.0</a>; all via Wikimedia Commons.</p>
+    <p class="credits">Pictures: <a href="https://commons.wikimedia.org/w/index.php?curid=10552964">“MBTA Red Line train departing Quincy Adams station”</a> by Ben Schumin, <a href="https://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0</a>; <a href="https://commons.wikimedia.org/w/index.php?curid=23331688">“Green Line Trolley at Heath St Boston 2012”</a> by Wikiklrsc, <a href="https://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0</a>; <a href="https://commons.wikimedia.org/w/index.php?curid=137696221">“MBTA commuter rail train at Anderson RTC, 2023”</a> by Ilia2011, <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>; <a href="https://commons.wikimedia.org/w/index.php?curid=15374968">“Silver Line at D Street”</a> by Connie, <a href="https://creativecommons.org/licenses/by/2.0/">CC BY 2.0</a>; all via Wikimedia Commons. The fleet reel is cut from these four pictures.</p>
   </footer>
 </body>
 </html>

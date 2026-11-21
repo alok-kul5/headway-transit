@@ -113,8 +113,8 @@ function base(extra = {}) {
       tooltip: { backgroundColor: css("--ink"), titleColor: css("--paper"), bodyColor: css("--paper"), padding: 10, cornerRadius: 10, displayColors: false },
     },
     scales: {
-      x: { grid: { display: false }, ticks: { color: ink, font: { family: "Geist Mono", size: 11 } }, border: { display: false } },
-      y: { grid: { color: grid, lineWidth: 2 }, ticks: { color: ink, font: { family: "Geist Mono", size: 11 } }, border: { display: false } },
+      x: { grid: { display: false }, ticks: { color: ink, font: { family: "Martian Mono", size: 10 } }, border: { display: false } },
+      y: { grid: { color: grid, lineWidth: 2 }, ticks: { color: ink, font: { family: "Martian Mono", size: 10 } }, border: { display: false } },
     },
     ...extra,
   };
@@ -214,7 +214,15 @@ function routes(rows) {
     || `<tr><td colspan="6">Not enough observations yet.</td></tr>`;
 }
 
+/* Fleet reel: play only while on screen, never with reduced motion. */
+function reel() {
+  const v = $(".reel-video");
+  if (!v || reduced()) return;
+  new IntersectionObserver(([e]) => { if (e.isIntersecting) v.play().catch(() => {}); else v.pause(); }, { threshold: 0.25 }).observe(v);
+}
+
 (async () => {
+  reel();
   document.querySelectorAll(".reveal").forEach((el) => {
     const siblings = [...el.parentElement.querySelectorAll(":scope > .reveal")];
     watch(el, Math.max(0, siblings.indexOf(el)));
