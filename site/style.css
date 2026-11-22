@@ -8,12 +8,12 @@
   --paper: #f2f1ee;
   --paper-2: #e8e6e1;
   --ink: #111214;
-  --ink-2: #3c3d40;
-  --ink-3: #6b6c70;
+  --ink-2: #2b2c2f;
+  --ink-3: #4a4b4f;
   --board: #0f1012;
   --board-2: #1b1c1f;
   --board-ink: #ffd24a;      /* departure-board amber */
-  --board-dim: #a19a86;
+  --board-dim: #c6bfaa;
   --late: #ff6a4d;
   /* MBTA line colours, used as fields and as data */
   --red: #da291c;
@@ -34,10 +34,10 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     color-scheme: dark;
-    --paper: #121315; --paper-2: #1c1d20; --ink: #f3f2ee; --ink-2: #c9c8c3; --ink-3: #94938e; --line: rgb(255 255 255 / 0.1);
+    --paper: #121315; --paper-2: #1c1d20; --ink: #f3f2ee; --ink-2: #dddcd7; --ink-3: #b6b5b0; --line: rgb(255 255 255 / 0.1);
   }
 }
-:root[data-theme="dark"] { color-scheme: dark; --paper: #121315; --paper-2: #1c1d20; --ink: #f3f2ee; --ink-2: #c9c8c3; --ink-3: #94938e; --line: rgb(255 255 255 / 0.1); }
+:root[data-theme="dark"] { color-scheme: dark; --paper: #121315; --paper-2: #1c1d20; --ink: #f3f2ee; --ink-2: #dddcd7; --ink-3: #b6b5b0; --line: rgb(255 255 255 / 0.1); }
 
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
