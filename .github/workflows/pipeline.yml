@@ -104,7 +104,12 @@ jobs:
     steps:
       - name: Wait 30 minutes
         run: sleep 1500
+      # Every cron run starts a chain too, so chains used to pile up. Only queue
+      # the next run when no other run is already going: one chain survives.
       - name: Queue the next run
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh workflow run pipeline.yml --repo "$GITHUB_REPOSITORY" --ref main
+        run: |
+          others=$(gh run list --repo "$GITHUB_REPOSITORY" --workflow pipeline.yml --limit 50             --json databaseId,status --jq "[.[] | select(.status != \"completed\" and .databaseId != ${GITHUB_RUN_ID})] | length")
+          if [ "$others" -gt 0 ]; then echo "$others other run(s) going; this chain stops here"; exit 0; fi
+          gh workflow run pipeline.yml --repo "$GITHUB_REPOSITORY" --ref main

@@ -48,7 +48,9 @@ function hero(summary, nowModes, nowLate) {
   const vehicles = nowModes.reduce((n, m) => n + m.vehicles, 0);
   const onTime = vehicles ? nowModes.reduce((n, m) => n + (m.on_time_pct * m.vehicles) / 100, 0) / vehicles * 100 : summary.on_time_pct;
   const big = $("#big-pct");
-  $(".hero-card").addEventListener("revealed", () => countUp(big, Math.round(onTime), 0, 1600), { once: true });
+  // the card is on screen at load, so it is often revealed before the data arrives
+  const card = $(".hero-card"), run = () => countUp(big, Math.round(onTime), 0, 1600);
+  if (card.classList.contains("in")) run(); else card.addEventListener("revealed", run, { once: true });
   const worst = nowLate[0];
   $("#hero-sub").textContent = worst
     ? `${vehicles.toLocaleString()} vehicles in the latest snapshot. Worst right now: ${worst.route_name} at ${worst.stop_name}, ${Math.round(worst.delay_min)} minutes behind.`
